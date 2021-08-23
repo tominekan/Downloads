@@ -28,6 +28,9 @@ int download_file(char *url, char *path) {
     // Send all data to the write_data() function
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
 
+    // This is to handle the http 3xx redirects
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+
     // open the file
     filehandle = fopen(path, "wb");
     if (filehandle) {
@@ -48,6 +51,6 @@ int download_file(char *url, char *path) {
     return EXIT_SUCCESS;
 }
 
-int main(int argc, char **argv) {
-    download_file("https://google.com", "index.html");
+int main() {
+    return download_file("https://google.com", "index.html");
 }
