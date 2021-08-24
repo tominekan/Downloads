@@ -51,6 +51,8 @@ int download_file(char *url, char *path) {
     return EXIT_SUCCESS;
 }
 
+
+int rename() {}
 int main() {
     return download_file("https://google.com", "index.html");
 }
