@@ -2,12 +2,26 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 
+// Specified operations
+#define FUR_RENAME 1
+#define FUR_DELETE 2 
+#define FUR_DOWNLOAD 3
+
+// This is the data type for the inputs
+struct InputData {
+    char *old_path;
+    char *new_path;
+    char *url;
+    char *download_path;
+};
+
 static size_t write_data(void *ptr, size_t size, size_t num_members, void *stream) {
     size_t written = fwrite(ptr, size, num_members, (FILE *) stream);
     return written;
 }
 
-int download_file(char *url, char *path) {
+// Simply downloads stuff from a url to a speified name
+int download_file(char *url, char *file_name) {
     CURL *curl_handle; 
     FILE *filehandle;
  
@@ -32,7 +46,7 @@ int download_file(char *url, char *path) {
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
 
     // open the file
-    filehandle = fopen(path, "wb");
+    filehandle = fopen(file_name, "wb");
     if (filehandle) {
         // Write the content to the file handle
         curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, filehandle);
@@ -51,8 +65,24 @@ int download_file(char *url, char *path) {
     return EXIT_SUCCESS;
 }
 
+// Performs an operation specified by the operation macro
+// and InputData
+int operation(int operation, struct InputData data) {   
+    if (operation == FUR_RENAME) { 
+        return rename(data.old_path, data.new_path);
 
-int rename() {}
+    } else if (operation == FUR_DOWNLOAD) {
+        return download_file(data.url, data.download_path);
+    
+    } else {
+        return EXIT_FAILURE;
+    }
+}
+
 int main() {
-    return download_file("https://google.com", "index.html");
+    download_file("https://google.com", "index.html");
+    struct InputData data;
+    data.old_path = "index.html";
+    data.new_path = "main.html";
+    return operation(FUR_RENAME, data);
 }
